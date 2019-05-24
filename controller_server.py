@@ -22,7 +22,7 @@ __version__ = '1.0.0'
 __vernum__ = tuple([int(s) for s in __version__.split('.')])
 DEBUG = False
 ENGINE_PAUSED = False
-GUI = False
+GUI = True
 
 max_fps = 60
 trigger_error_win = -3.051850947599719e-05
@@ -360,11 +360,11 @@ def handle_hat_motion(event):
 # ANALYSIS OBJECTS
 #/////////////////////////////
 
-ls_velocity = StickVelocityTracker(left_stick, max_fps)
-rs_velocity = StickVelocityTracker(right_stick, max_fps)
-lt_velocity = TriggerVelocityTracker(left_trigger, max_fps)
-rt_velocity = TriggerVelocityTracker(right_trigger, max_fps)
-density = DensityTracker(buttons, max_fps)
+ls_velocity = StickVelocityTracker(max_fps)
+rs_velocity = StickVelocityTracker(max_fps)
+lt_velocity = TriggerVelocityTracker(max_fps)
+rt_velocity = TriggerVelocityTracker(max_fps)
+density = DensityTracker(list(buttons.keys()), max_fps)
 # [end ANALYSIS OBJECTS]
 
 
@@ -419,11 +419,14 @@ if GUI:
                     quit()
 
             # analysis objects update
-            ls_velocity.tick()
-            rs_velocity.tick()
-            lt_velocity.tick()
-            rt_velocity.tick()
-            density.tick()
+            ls_velocity.tick(left_stick.x, left_stick.y)
+            rs_velocity.tick(right_stick.x, right_stick.y)
+            lt_velocity.tick(left_trigger.value)
+            rt_velocity.tick(right_trigger.value)
+            btn_values = {}
+            for btn in buttons:
+                btn_values[btn] = buttons[btn].value
+            density.tick(btn_values)
             analysis_values['LXVel'] = ls_velocity['X']['LongTermVel']
             analysis_values['LYVel'] = ls_velocity['Y']['LongTermVel']
             analysis_values['RXVel'] = rs_velocity['X']['LongTermVel']
@@ -494,11 +497,14 @@ else:
                 quit()
 
         # analysis objects update
-        ls_velocity.tick()
-        rs_velocity.tick()
-        lt_velocity.tick()
-        rt_velocity.tick()
-        density.tick()
+        ls_velocity.tick(left_stick.x, left_stick.y)
+        rs_velocity.tick(right_stick.x, right_stick.y)
+        lt_velocity.tick(left_trigger.value)
+        rt_velocity.tick(right_trigger.value)
+        btn_values = {}
+        for btn in buttons:
+            btn_values[btn] = buttons[btn].value
+        density.tick(btn_values)
         analysis_values['LXVel'] = ls_velocity['X']['LongTermVel']
         analysis_values['LYVel'] = ls_velocity['Y']['LongTermVel']
         analysis_values['RXVel'] = rs_velocity['X']['LongTermVel']
